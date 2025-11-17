@@ -40,7 +40,7 @@ namespace AI_Strategy {
                     }
 
                 }
-                /* Let us be unpredictable if we spawn at 0 too long */
+                /* Let us be unpredictable if we spawn at 0 too long, this is frankly just for fun */
                 if(numberOfTimesSpawnedAtZero > 4) x = random.Next(PlayerLane.WIDTH);
 
                 /* We keep track of this in case we spawn too often at 0, just to spice things up then. */
@@ -69,8 +69,8 @@ namespace AI_Strategy {
                 attempt++;
 
                 int x = GetMostImportantLaneToDefend();
-                int y = GetWhereMostSoldiersAre() + 2; // I feel bad for leaving the rando height but I swear this works best
-                if (player.HomeLane.GetCellAt(x, Clamp(y, 0, PlayerLane.HEIGHT)).Unit == null) {
+                int y = GetWhereMostSoldiersAre() + 2; // Always offset by 2 to not jump the soldiers like an antifa protester seeing a cop
+                if (player.HomeLane.GetCellAt(x, Clamp(y, 0, PlayerLane.HEIGHT - 1)).Unit == null) {
                     var trybuy = player.TryBuyTower<Tower>(x, y);
 
                     if (trybuy == Player.TowerPlacementResult.Success) {
@@ -103,6 +103,7 @@ namespace AI_Strategy {
 
             }
             soldiersInRows.Sort((a, b) => b.soldiers.CompareTo(a.soldiers));
+            if (soldiersInRows[0].soldiers > 15) return soldiersInRows[1].row; // We return the second best lane in case a lane gets overtly crowded in soldiers and we can't do much anymore
             return soldiersInRows[0].row;
 
         }

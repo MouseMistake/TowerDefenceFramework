@@ -53,8 +53,10 @@ namespace AI_TowerDefense
             // here you replace the selected strategy with your strategy class(es).
             // Your strategy should at least be able to beat random!
             
-            _playerAStrategy = new RandomStrategyLoggerDemo(_playerA);
-            _playerBStrategy = new StrategyLoop(_playerB);
+            // My strategy really hates playing against itself, problem being that the moment
+            // one takes over it's pretty much joever. I can't really figure out a better defense
+            _playerAStrategy = new StrategyLoop(_playerA);
+            _playerBStrategy = new RandomStrategyLoggerDemo(_playerB);
         }
 
         public static TowerDefense Instance => instance ??= new TowerDefense();

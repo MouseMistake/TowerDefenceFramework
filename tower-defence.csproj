@@ -63,6 +63,7 @@
     <Compile Include="AI_TowerDefense\GameFramework\Soldier.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Tower.cs" />
     <Compile Include="AI_TowerDefense\GameFramework\Unit.cs" />
+    <Compile Include="AI_TowerDefense\Niels-Strategy\NielsSoldier.cs" />
     <Compile Include="AI_TowerDefense\Niels-Strategy\StrategyLoop.cs" />
     <Compile Include="AI_TowerDefense\Program.cs" />
     <Compile Include="AI_TowerDefense\TowerDefense.cs" />

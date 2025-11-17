@@ -54,7 +54,7 @@ namespace AI_TowerDefense
             // Your strategy should at least be able to beat random!
             
             _playerAStrategy = new StrategyLoop(_playerA);
-            _playerBStrategy = new StrategyLoop(_playerB);
+            _playerBStrategy = new RandomStrategyLoggerDemo(_playerB);
         }
 
         public static TowerDefense Instance => instance ??= new TowerDefense();

@@ -21,6 +21,9 @@ namespace AI_Strategy {
 
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
+            /* If we got too many people attacking on our home turf, let's focus on defending */
+            if (player.HomeLane.SoldierCount() > 5) return;
+
             int attempt = 0;
             while (player.Gold > 5 && attempt < 10) {
                 attempt++;
@@ -62,12 +65,12 @@ namespace AI_Strategy {
         /* Called by game loop to deploy Towers */
         public override void DeployTowers() {
             int attempt = 0;
-            if (player.Gold > 8 && attempt < 10) {
+            if (player.Gold > 8 && attempt < 30) {
                 attempt++;
 
                 int x = GetMostImportantLaneToDefend();
-                int y = random.Next(PlayerLane.HEIGHT);
-                if (player.HomeLane.GetCellAt(x, y).Unit == null) {
+                int y = GetWhereMostSoldiersAre() + 2; // I feel bad for leaving the rando height but I swear this works best
+                if (player.HomeLane.GetCellAt(x, Clamp(y, 0, PlayerLane.HEIGHT)).Unit == null) {
                     var trybuy = player.TryBuyTower<Tower>(x, y);
 
                     if (trybuy == Player.TowerPlacementResult.Success) {
@@ -92,7 +95,19 @@ namespace AI_Strategy {
 
         }
 
-        /* Tries to decide which line to defend according to where the most soldiers are */
+        /* Tries to decide which row to position our defense on according to where the most soldiers are */
+        private int GetWhereMostSoldiersAre() {
+            List<(int soldiers, int row)> soldiersInRows = new List<(int soldiers, int row)>();
+            for (int i = 0; i < PlayerLane.HEIGHT; i++) {
+                soldiersInRows.Add((CheckRowForSoldiers(i), i));
+
+            }
+            soldiersInRows.Sort((a, b) => b.soldiers.CompareTo(a.soldiers));
+            return soldiersInRows[0].row;
+
+        }
+
+        /* Tries to decide which lane to defend according to where the most soldiers are */
         private int GetMostImportantLaneToDefend() {
             List<(int soldiers, int lane)> soldiersInLanes = new List<(int soldiers, int lane)>();
             for (int i = 0; i < PlayerLane.WIDTH; i++) {
@@ -126,8 +141,23 @@ namespace AI_Strategy {
 
         }
 
+        private int CheckRowForSoldiers(int y) {
+            int soldiers = 0;
+            /* We want to check if the amount of soldiers on a specified row */
+            for (int i = 0; i < PlayerLane.WIDTH; i++) {
+                if (player.HomeLane.GetCellAt(i, y)?.Unit is Soldier) soldiers++;
+
+            }
+            return soldiers;
+
+        }
+
+        // This was taken off online, because we're relying on .net framework 4 so it stupidly doesn't have clamp by default lmao
+        int Clamp(int value, int min, int max) {
+            return Math.Max(min, Math.Min(max, value));
+
+        }
 
     }
-
     
 }

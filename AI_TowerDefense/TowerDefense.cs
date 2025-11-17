@@ -53,7 +53,7 @@ namespace AI_TowerDefense
             // here you replace the selected strategy with your strategy class(es).
             // Your strategy should at least be able to beat random!
             
-            _playerAStrategy = new StrategyLoop(_playerA);
+            _playerAStrategy = new RandomStrategyLoggerDemo(_playerA);
             _playerBStrategy = new StrategyLoop(_playerB);
         }
 
@@ -69,7 +69,8 @@ namespace AI_TowerDefense
             Console.SetCursorPosition(0, 0);
             Console.Write("Turns: " + turns + "");
 
-            ConsoleColor defaultColor = Console.ForegroundColor;
+            /* Not enforcing white would sometimes make the game boot in another color */
+            ConsoleColor defaultColor = ConsoleColor.White;
             Console.SetCursorPosition(0, 2);
 
             string clearSpaces = "                    ";

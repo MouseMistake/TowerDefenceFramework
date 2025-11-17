@@ -15,6 +15,8 @@ namespace AI_Strategy {
         private int towerCounter = 0;
         private int soldierCounter = 0;
         private int numberOfTimesSpawnedAtZero = 0;
+        private int minimumGoldForSoldier = 2;
+        private int minimumGoldForTower = 5;
 
         /* Constructor */
         public StrategyLoop(Player player) : base(player) { }
@@ -22,10 +24,13 @@ namespace AI_Strategy {
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
             /* If we got too many people attacking on our home turf, let's focus on defending */
-            if (player.HomeLane.SoldierCount() > 5) return;
+            if (player.HomeLane.SoldierCount() > 7) return;
+
+            minimumGoldForSoldier *= player.HomeLane.TowerCount();
+            minimumGoldForSoldier = Clamp(minimumGoldForSoldier, 2, 50); // Admittedly pathetic attempt at introducing some dynamism
 
             int attempt = 0;
-            while (player.Gold > 5 && attempt < 10) {
+            while (player.Gold > minimumGoldForSoldier && attempt < 10) {
                 attempt++;
 
                 /* The randomizer is only there so we can have some value if there are towers on every lane */
@@ -65,9 +70,10 @@ namespace AI_Strategy {
         /* Called by game loop to deploy Towers */
         public override void DeployTowers() {
             int attempt = 0;
-            if (player.Gold > 8 && attempt < 30) {
+            if (player.Gold > minimumGoldForTower && attempt < 30) {
                 attempt++;
 
+                /* Doesn't look like much, because it's nested methods (see below) */
                 int x = GetMostImportantLaneToDefend();
                 int y = GetWhereMostSoldiersAre() + 2; // Always offset by 2 to not jump the soldiers like an antifa protester seeing a cop
                 if (player.HomeLane.GetCellAt(x, Clamp(y, 0, PlayerLane.HEIGHT - 1)).Unit == null) {

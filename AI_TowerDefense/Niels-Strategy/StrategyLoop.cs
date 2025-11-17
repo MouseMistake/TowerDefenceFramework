@@ -86,12 +86,14 @@ namespace AI_Strategy {
         }
 
         public override List<Soldier> SortedSoldierArray(List<Soldier> unsortedList) {
-            return unsortedList;
+            /* The soldiers closest to the home run get their command first */
+            return unsortedList.OrderByDescending(s => s.PosY).ToList();
 
         }
 
         public override List<Tower> SortedTowerArray(List<Tower> unsortedList) {
-            return unsortedList;
+            /* Basically we're forcing the towers to go where the most soldiers in sorting as well */
+            return unsortedList.OrderByDescending(t => CheckRowForSoldiers(t.PosY)).ToList();
 
         }
 

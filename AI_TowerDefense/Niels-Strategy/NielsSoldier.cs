@@ -16,6 +16,7 @@ namespace AI_Strategy {
                 if (kamikazeOverride) {
                     for (int i = speed; i > 0; i--) {
                         MoveTo(x, y + i); // Oh my boy if the override is on we are GOING TO THE FRONT
+                        return;
 
                     }
 
@@ -25,6 +26,7 @@ namespace AI_Strategy {
                  * basically making a run for it hopefully.
                  * But, if health is too low, we go kamikaze to try to take down the enemy's towers. */
                 if (CheckLaneForTower(x, y) && health > 3) {
+                    kamikazeOverride = false;
                     for (int i = speed; i > 0; i--) {
                         if (MoveTo(x + i, y)) return; // Try to go right
                         if (MoveTo(x - i, y)) return; // If that doesn't work, try to go left
@@ -34,10 +36,7 @@ namespace AI_Strategy {
                     }
 
                 } else {
-                    for (int i = speed; i > 0; i--) {
-                        if (MoveTo(x, y + i)) return; // If there's no tower on the way, it's free real estate
-
-                    }
+                    kamikazeOverride = true; // If there's no tower on the way, it's free real estate
 
                 }
 

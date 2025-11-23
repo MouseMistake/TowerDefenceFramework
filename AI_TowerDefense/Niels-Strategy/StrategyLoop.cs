@@ -23,11 +23,12 @@ namespace AI_Strategy {
 
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
-            /* If we got too many people attacking on our home turf, let's focus on defending */
-            if (player.HomeLane.SoldierCount() > 7) return;
+            /* If we got too many people attacking on our home turf, let's focus on defending. Post-battle day: Continue spawning soldiers anyway if we have a  */
+            if (player.HomeLane.SoldierCount() > 20 && player.HomeLane.SoldierCount() < 130) return;
 
-            minimumGoldForSoldier *= player.HomeLane.TowerCount();
-            minimumGoldForSoldier = Clamp(minimumGoldForSoldier, 2, 50); // Admittedly pathetic attempt at introducing some dynamism
+            /* Keeping this in to show the thinking process, but this was frankly unnecessary and embarassing */ 
+            // minimumGoldForSoldier *= player.HomeLane.TowerCount();
+            // minimumGoldForSoldier = Clamp(minimumGoldForSoldier, 2, 50); // Admittedly pathetic attempt at introducing some dynamism
 
             int attempt = 0;
             while (player.Gold > minimumGoldForSoldier && attempt < 10) {
@@ -45,7 +46,7 @@ namespace AI_Strategy {
                     }
 
                 }
-                /* Let us be unpredictable if we spawn at 0 too long, this is frankly just for fun */
+                /* Let us be unpredictable if we spawn at 0 too long, this is just for fun any dynamism. Could just spam at 0 if we wanted to */
                 if(numberOfTimesSpawnedAtZero > 4) x = random.Next(PlayerLane.WIDTH);
 
                 /* We keep track of this in case we spawn too often at 0, just to spice things up then. */

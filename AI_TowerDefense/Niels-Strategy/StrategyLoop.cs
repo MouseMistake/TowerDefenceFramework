@@ -17,16 +17,32 @@ namespace AI_Strategy {
         private int numberOfTimesSpawnedAtZero = 0;
         private int minimumGoldForSoldier = 2;
         private int minimumGoldForTower = 5;
+        private int lastScore = 0;
+        private int staleChecker = 0;
+        private bool spamTowerBuilding = false;
+        private int spamTowerThreshold = 200;
 
         /* Constructor */
         public StrategyLoop(Player player) : base(player) { }
 
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
-            /* If we got too many people attacking on our home turf, let's focus on defending. Post-battle day: Continue spawning soldiers anyway if we get Dustin'ed */
-            if (player.HomeLane.SoldierCount() > 40 && player.HomeLane.SoldierCount() < 130) return;
+            /* Records the number of turns in which the score has updated */
+            if (lastScore != player.Score) staleChecker++;
+            else staleChecker = 0;
 
-            /* Keeping this in to show the thinking process, but this was frankly unnecessary and embarassing */ 
+            /* If we got too many people attacking on our home turf, let's focus on defending. Post-battle day: Continue spawning soldiers anyway if we get Dustin'ed */
+            if (player.Gold > spamTowerThreshold) {
+                spamTowerBuilding = true;
+                return;
+
+            } else {
+                spamTowerBuilding = false;
+
+            }
+            if (player.HomeLane.SoldierCount() > 15 && player.HomeLane.SoldierCount() < 130) return;
+            if (TowerDefense.Instance.Turns < 20) return;
+            /* Keeping this in to show the thinking process, but this was frankly unnecessary and embarassing */
             // minimumGoldForSoldier *= player.HomeLane.TowerCount();
             // minimumGoldForSoldier = Clamp(minimumGoldForSoldier, 2, 50); // Admittedly pathetic attempt at introducing some dynamism
 
@@ -40,6 +56,7 @@ namespace AI_Strategy {
 
                 for (int i = 0;  i < PlayerLane.WIDTH; i++) {
                     if(!CheckLaneForTower(i, y)) {
+                        /* Checking where we need the place the soldier on the X axis */
                         x = i;
                         break;
 
@@ -49,15 +66,25 @@ namespace AI_Strategy {
                 /* Let us be unpredictable if we spawn at 0 too long, this is just for fun any dynamism. Could just spam at 0 if we wanted to */
                 if(numberOfTimesSpawnedAtZero > 4) x = random.Next(PlayerLane.WIDTH);
 
-                /* We keep track of this in case we spawn too often at 0, just to spice things up then. */
+                /* We keep track of this in case we spawn too often at 0, just to spice things up then */
                 if (x == 0) numberOfTimesSpawnedAtZero++;
                 else numberOfTimesSpawnedAtZero = 0;
 
                 if (player.EnemyLane.GetCellAt(x, y).Unit == null) {
                     var trybuy = player.TryBuySoldier<NielsSoldier>(x);
 
+                    /* If we suceed in placing the soldier */
                     if (trybuy == Player.SoldierPlacementResult.Success) {
                         soldierCounter++;
+
+                        /* Accessing the soldier by reference, because if we're spamming too much we're going kamikaze */
+                        NielsSoldier soldier = player.EnemyLane.GetCellAt(x, y)?.Unit as NielsSoldier;
+
+                        /* We also go kamikaze if the score hasn't moved in 20 rounds, in an attempt to get unstuck if such were the case */
+                        if (soldier != null && (player.EnemyLane.SoldierCount() > 25 || staleChecker > 20)) {
+                            soldier.kamikazeOverride = true;
+
+                        }
                         DebugLogger.Log($"(P{player.Name}) S #{soldierCounter} deployed a-t {attempt}.");
 
                     }
@@ -71,6 +98,45 @@ namespace AI_Strategy {
         /* Called by game loop to deploy Towers */
         public override void DeployTowers() {
             int attempt = 0;
+
+            /* Only on the first rounds */
+            if(TowerDefense.Instance.Turns < 20) {
+                if (TowerDefense.Instance.Turns < 5) spamTowerBuilding = true; // Overrides the spamTowerBuilding at first before DeploySoldiers can
+                for (int initWallY = 2; initWallY < 4; initWallY++) {
+                    for (int x = 0; x < 5; x++) {
+                        var trybuy = player.TryBuyTower<Tower>(x, initWallY);
+
+                        if (trybuy == Player.TowerPlacementResult.Success) {
+                            towerCounter++;
+                            DebugLogger.Log($"(P{player.Name}) T #{towerCounter} deployed a-t {attempt}.");
+
+                        }
+
+                    }
+
+                }
+
+            }
+            /* Spawning an army of towers if we have too much money to spare */
+            if (spamTowerBuilding) {
+                for (int initWallY = PlayerLane.HEIGHT; initWallY > 0; initWallY--) {
+                    for (int x = 0; x < PlayerLane.WIDTH; x++) {
+                        var trybuy = player.TryBuyTower<Tower>(x, initWallY);
+
+                        if (trybuy == Player.TowerPlacementResult.Success) {
+                            towerCounter++;
+                            /* SM Stands for spam mode */
+                            DebugLogger.Log($"(P{player.Name}) - SM - T #{towerCounter} deployed a-t {attempt}.");
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            /* Standard placement method I used in the tournament */
             if (player.Gold > minimumGoldForTower && attempt < 30) {
                 attempt++;
 

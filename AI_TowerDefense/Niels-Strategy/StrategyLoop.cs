@@ -117,6 +117,7 @@ namespace AI_Strategy {
                 }
 
             }
+
             /* Spawning an army of towers if we have too much money to spare */
             if (spamTowerBuilding) {
                 for (int initWallY = PlayerLane.HEIGHT; initWallY > 0; initWallY--) {

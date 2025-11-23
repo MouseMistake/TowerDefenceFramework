@@ -24,6 +24,8 @@ namespace AI_Strategy {
 
         /* Constructor */
         public StrategyLoop(Player player) : base(player) { }
+        
+        /* SIDE ONE */
 
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
@@ -158,6 +160,8 @@ namespace AI_Strategy {
             }
 
         }
+
+        /* SIDE TWO */
 
         public override List<Soldier> SortedSoldierArray(List<Soldier> unsortedList) {
             /* The soldiers closest to the home run get their command first */

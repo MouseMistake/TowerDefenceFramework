@@ -23,8 +23,8 @@ namespace AI_Strategy {
 
         /* Called by game loop to deploy Soldiers */
         public override void DeploySoldiers() {
-            /* If we got too many people attacking on our home turf, let's focus on defending. Post-battle day: Continue spawning soldiers anyway if we have a  */
-            if (player.HomeLane.SoldierCount() > 20 && player.HomeLane.SoldierCount() < 130) return;
+            /* If we got too many people attacking on our home turf, let's focus on defending. Post-battle day: Continue spawning soldiers anyway if we get Dustin'ed */
+            if (player.HomeLane.SoldierCount() > 40 && player.HomeLane.SoldierCount() < 130) return;
 
             /* Keeping this in to show the thinking process, but this was frankly unnecessary and embarassing */ 
             // minimumGoldForSoldier *= player.HomeLane.TowerCount();
